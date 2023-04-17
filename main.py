@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 from bs4 import BeautifulSoup
 
+
 def search_autos(url):
     try:
        response = requests.get(url)
@@ -22,10 +23,19 @@ def parsing_html(html):
         print(error)
 
 
+def get_links(soup):
+    links = []
+    cards_sup = soup.find("div", class_="cards")
+    cards = cards_sup.find_all("a")
+    for card in cards:
+        links.append(card["href"])
+    return links
+
 if __name__ == "__main__":
     load_dotenv()
     url = os.getenv("BASE_URL")
     response = search_autos(f'{url}/automoveis')
     if response:
         soup = parsing_html(response)
-        print(soup)
+        links = get_links(soup)
+        print(links)
