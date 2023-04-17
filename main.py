@@ -16,4 +16,4 @@ def search_autos(url):
 if __name__ == "__main__":
     load_dotenv()
     url = os.getenv("BASE_URL")
-    search_autos(f'{url}automoveis')
+    search_autos(f'{url}/automoveis')
