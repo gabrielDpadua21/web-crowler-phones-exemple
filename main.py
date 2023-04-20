@@ -2,6 +2,7 @@ import requests
 from dotenv import load_dotenv
 import os
 from bs4 import BeautifulSoup
+import re
 
 
 def search_autos(url):
@@ -30,6 +31,12 @@ def get_links(soup):
     for card in cards:
         links.append(card["href"])
     return links
+
+
+def extract_phones(text):
+    pattern = "\(?0?([1-9]{2})[ -\.\)]{0,2}?(9?\d{4})[ -\.]?(\d{4})"
+    return re.findall(pattern, text)
+
 
 if __name__ == "__main__":
     load_dotenv()
