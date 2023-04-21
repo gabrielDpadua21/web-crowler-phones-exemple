@@ -5,6 +5,9 @@ from bs4 import BeautifulSoup
 import re
 
 
+LINKS = []
+
+
 def search_autos(url) -> str:
     try:
        response = requests.get(url)
@@ -80,9 +83,11 @@ def validate_adv(text) -> None:
 
 
 def request_links(URL, links) -> None:
-    for link in links:
-        adv = get_advertisement(URL, link)
-        validate_adv(adv)
+    if len(links) > 0:
+        link_adv = links.pop(0)
+        text = get_advertisement(URL, link_adv)
+        validate_adv(text)
+        request_links(URL, links)
 
 
 if __name__ == "__main__":
