@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 from bs4 import BeautifulSoup
 import re
+import threading
 
 
 LINKS = []
@@ -65,7 +66,9 @@ def get_advertisement(URL, link) -> str:
 
 def save_phones(phones) -> None:
     if len(phones) > 0:
-        print(phones)
+        with open("phones.txt", "a") as file:
+            for phone in phones:
+                file.write(f"{phone}\n")
 
 
 def get_infos_soup_adv(soup) -> None:
@@ -82,12 +85,12 @@ def validate_adv(text) -> None:
         get_infos_soup_adv(soup_adv)
 
 
-def request_links(URL, links) -> None:
-    if len(links) > 0:
-        link_adv = links.pop(0)
+def request_links() -> None:
+    while LINKS:
+        URL = os.getenv("BASE_URL")
+        link_adv = LINKS.pop(0)
         text = get_advertisement(URL, link_adv)
         validate_adv(text)
-        request_links(URL, links)
 
 
 if __name__ == "__main__":
@@ -96,6 +99,14 @@ if __name__ == "__main__":
     response = search_autos(f'{url}/automoveis')
     if response:
         soup = parsing_html(response)
-        links = get_links(soup)
-        request_links(url, links)
-        
+        LINKS = get_links(soup)
+        threads = []
+        print(" starting search phones...")
+        for _ in range(len(LINKS)):
+            thread = threading.Thread(target=request_links)
+            threads.append(thread)
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        print("Finished")
